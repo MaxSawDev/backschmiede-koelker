@@ -1,7 +1,11 @@
 # Dockerfile
 # --- Build ---
-FROM node:24-bookworm-slim AS builder
+FROM node:24.18.0-bookworm-slim AS builder
 WORKDIR /app
+
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm ci
@@ -23,7 +27,7 @@ ENV SKIP_DB_DURING_BUILD=1
 RUN npm run build
 
 # --- Runtime ---
-FROM node:24-bookworm-slim AS runner
+FROM node:24.18.0-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV SKIP_DB_DURING_BUILD=0
@@ -33,15 +37,19 @@ RUN apt-get update -y \
   && rm -rf /var/lib/apt/lists/*
 
 # Next standalone + static + public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
 
 # Prisma: Schema + Engines + Client (für Query & Migrations)
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/generated ./generated
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder --chown=node:node /app/prisma ./prisma
+COPY --from=builder --chown=node:node /app/generated ./generated
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+
+RUN mkdir -p /app/.next/cache /uploads \
+  && chown -R node:node /app/.next/cache /uploads
 
 EXPOSE 3000
-CMD ["sh", "-c", "node server.js"]
+USER node
+CMD ["node", "server.js"]

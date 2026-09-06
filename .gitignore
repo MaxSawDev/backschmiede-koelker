@@ -57,3 +57,4 @@ uploads_localhost/*
 !uploads_localhost/*/.gitkeep
 
 .docker-npm.stamp
+fragen_baeckerei_inhalte.txt

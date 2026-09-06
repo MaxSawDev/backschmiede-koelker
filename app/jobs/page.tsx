@@ -6,6 +6,7 @@ import { buildFacetsFromActiveJobs } from "@/app/components/jobs/facets";
 import { buildJobsListJsonLd } from "@/app/components/jobs/job-schema";
 import { fetchJobs } from "@/app/lib/jobs/db";
 import { Suspense } from "react";
+import { serializeJsonLd } from "@/app/lib/json-ld";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,7 +51,7 @@ export default async function Page({
 
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJobsListJsonLd(jobs)) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildJobsListJsonLd(jobs)) }}
         />
 
         <JobList jobs={jobs} />

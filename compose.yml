@@ -1,15 +1,50 @@
 # compose.yml
 services:
   backschmiede-koelker:
-    image: ghcr.io/backschmiede-koelker/backschmiede-koelker.de:latest
+    image: ${IMAGE_REFERENCE:-ghcr.io/backschmiede-koelker/backschmiede-koelker.de:latest}
+    pull_policy: ${IMAGE_PULL_POLICY:-always}
     container_name: backschmiede-koelker
     restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    cpus: "1.50"
+    mem_limit: 768m
+    mem_reservation: 256m
+    stop_grace_period: 20s
     expose:
       - "3000"
     env_file:
       - .env.prod
+    environment:
+      UPLOAD_DIR: /uploads
+      NODE_OPTIONS: --max-old-space-size=512
+      HOME: /tmp
+      NPM_CONFIG_CACHE: /tmp/.npm
+      XDG_CACHE_HOME: /tmp/.cache
     volumes:
       - ./uploads:/uploads
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+      - /app/.next/cache:rw,nosuid,nodev,size=128m,uid=1000,gid=1000,mode=0700
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch('http://127.0.0.1:3000/api/health', { signal: AbortSignal.timeout(4000) })
+          .then(async (response) => { const body = await response.json(); process.exit(response.ok && body.status === 'ok' ? 0 : 1); })
+          .catch(() => process.exit(1))
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
@@ -20,7 +55,6 @@ services:
     networks:
       - web
       - db
-    pull_policy: always
     logging:
       driver: "local"
       options:

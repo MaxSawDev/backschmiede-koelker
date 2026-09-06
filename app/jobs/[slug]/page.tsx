@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getJobBySlug } from "@/app/lib/jobs/db";
 import { JobDetail } from "@/app/components/jobs/job-detail";
 import { buildJobPostingJsonLd } from "@/app/components/jobs/job-schema";
+import { serializeJsonLd } from "@/app/lib/json-ld";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -39,7 +40,7 @@ export default async function JobDetailPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(buildJobPostingJsonLd(job)),
+          __html: serializeJsonLd(buildJobPostingJsonLd(job)),
         }}
       />
       <JobDetail job={job} />

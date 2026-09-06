@@ -83,8 +83,7 @@ jobs:
         run: |
           # führt im laufenden Web-Container die Migrations gegen DATABASE_URL aus
           cd "$(dirname "$COMPOSE_FILE_PATH")"
-          docker compose -f "$COMPOSE_FILE_PATH" exec -T backschmiede-koelker npx prisma migrate deploy
-          docker compose -f "$COMPOSE_FILE_PATH" exec -T backschmiede-koelker npx prisma db seed
+          docker compose -f "$COMPOSE_FILE_PATH" exec -T backschmiede-koelker ./node_modules/.bin/prisma migrate deploy
 
       - name: Cleanup old images
         run: docker image prune -f

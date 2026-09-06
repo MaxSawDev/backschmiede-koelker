@@ -64,14 +64,10 @@ export async function optimizeToWebp(
   input: Buffer,
   opts: { width: number; quality: number },
 ) {
-  let sharpFn: typeof import("sharp");
+  let sharpFn: (typeof import("sharp"))["default"];
   try {
     const sharpImport = await import("sharp");
-    sharpFn = (
-      "default" in sharpImport
-        ? (sharpImport.default as unknown as typeof import("sharp"))
-        : (sharpImport as unknown as typeof import("sharp"))
-    );
+    sharpFn = sharpImport.default;
   } catch (error) {
     throw new ImageOptimizationError(
       "optimizer-unavailable",

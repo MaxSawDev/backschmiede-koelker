@@ -2,6 +2,7 @@
 "use client"
 
 import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useMemo, useState, type FormEvent } from "react"
 
@@ -29,6 +30,7 @@ async function fetchLoginState(username: string): Promise<LoginState> {
 }
 
 export default function LoginForm() {
+  const router = useRouter()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -98,7 +100,8 @@ export default function LoginForm() {
     }
 
     setLoading(false)
-    window.location.href = "/admin"
+    router.replace("/admin")
+    router.refresh()
   }
 
   return (

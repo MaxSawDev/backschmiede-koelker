@@ -10,59 +10,57 @@ function toTelHref(phone: string) {
   return `tel:${phone.replace(/\s+/g, "")}`;
 }
 
+function LocationCard({
+  title,
+  address,
+  phoneHref,
+  phoneLabel,
+  mapHref,
+}: {
+  title: string;
+  address: string;
+  phoneHref: string;
+  phoneLabel: string;
+  mapHref?: string;
+}) {
+  return (
+    <div className="h-full rounded-2xl border border-emerald-800/10 dark:border-emerald-300/10 bg-white/70 dark:bg-white/5 p-4 shadow-sm">
+      <div className="text-sm opacity-80">Standort</div>
+      <h3 className="mt-1 text-base font-semibold">{title}</h3>
+      <div className="mt-2 text-sm leading-6">
+        {mapHref ? (
+          <a
+            href={mapHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block decoration-emerald-600/40
+                      hover:text-emerald-700 hover:decoration-emerald-600
+                      dark:hover:text-emerald-300 dark:decoration-emerald-300/30 dark:hover:decoration-emerald-300
+                      transition-colors"
+            aria-label={`Adresse auf Google Maps öffnen: ${title}`}
+          >
+            <div className="whitespace-pre-line">{address}</div>
+          </a>
+        ) : (
+          <div className="whitespace-pre-line">{address}</div>
+        )}
+      </div>
+      <div className="mt-3 text-sm">
+        Telefon:{" "}
+        <a href={phoneHref} className="underline underline-offset-2 hover:opacity-80">
+          {phoneLabel}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default async function Footer() {
   const year = new Date().getFullYear();
   const site = await getOrCreateSiteSettings().catch(() => ({
     id: "fallback",
     ...DEFAULT_SITE_SETTINGS,
   }));
-
-  function LocationCard({
-    title,
-    address,
-    phoneHref,
-    phoneLabel,
-    mapHref,
-  }: {
-    title: string;
-    address: string;
-    phoneHref: string;
-    phoneLabel: string;
-    mapHref?: string;
-  }) {
-    return (
-      <div className="h-full rounded-2xl border border-emerald-800/10 dark:border-emerald-300/10 bg-white/70 dark:bg-white/5 p-4 shadow-sm">
-        <div className="text-sm opacity-80">Standort</div>
-        <h3 className="mt-1 text-base font-semibold">{title}</h3>
-        <div className="mt-2 text-sm leading-6">
-          {mapHref ? (
-            <a
-              href={mapHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block decoration-emerald-600/40
-                        hover:text-emerald-700 hover:decoration-emerald-600
-                        dark:hover:text-emerald-300 dark:decoration-emerald-300/30 dark:hover:decoration-emerald-300
-                        transition-colors"
-              aria-label={`Adresse auf Google Maps öffnen: ${title}`}
-            >
-              <div className="whitespace-pre-line">{address}</div>
-            </a>
-          ) : (
-            <>
-              <div className="whitespace-pre-line">{address}</div>
-            </>
-          )}
-        </div>
-        <div className="mt-3 text-sm">
-          Telefon:{" "}
-          <a href={phoneHref} className="underline underline-offset-2 hover:opacity-80">
-            {phoneLabel}
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <footer className="mt-16 border-t border-emerald-800/10 dark:border-emerald-300/10 bg-white/70 dark:bg-zinc-900/60 backdrop-blur text-zinc-800 dark:text-zinc-200">

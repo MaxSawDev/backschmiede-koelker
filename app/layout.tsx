@@ -6,6 +6,7 @@ import LayoutWrapper from "./components/layout-wrapper";
 import Footer from "./components/footer";
 import { DEFAULT_OG_IMAGE, SITE_URL, localBusinessJsonLd } from "./lib/seo";
 import AnalyticsBeacon from "./components/analytics-beacon";
+import { serializeJsonLd } from "./lib/json-ld";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
@@ -51,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(localBusinessJsonLd()) }}
         />
       </head>
       <body className="bg-white text-black dark:bg-zinc-900 dark:text-white transition-colors duration-300 overflow-x-hidden">

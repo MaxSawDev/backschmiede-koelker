@@ -1,4 +1,4 @@
-// middleware.ts
+// proxy.ts
 import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { BUILDING } from "@/app/lib/flags";
@@ -7,7 +7,7 @@ type ReqWithAuth = NextRequest & {
   auth?: { user?: { role?: string | null } } | null;
 };
 
-export default auth((req: ReqWithAuth) => {
+const proxy = auth((req: ReqWithAuth) => {
   const url = req.nextUrl;
   const { pathname } = url;
 
@@ -54,12 +54,13 @@ export default auth((req: ReqWithAuth) => {
   return base;
 });
 
+export default proxy;
+
 export const config = {
   matcher: [
-    // `/api/upload` bleibt ausserhalb der NextAuth-Middleware, da multipart-Requests
-    // dort unter Next.js 15 sonst einen gelockten/disturbed Body bekommen koennen.
+    // `/api/upload` bleibt ausserhalb des NextAuth-Proxys, da multipart-Requests
+    // dort sonst einen gelockten/disturbed Body bekommen koennen.
     // Route ist noch durch withAdminGuard gesichert.
     "/((?!api/upload|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|images|fonts).*)",
   ],
-  runtime: "nodejs",
 };
